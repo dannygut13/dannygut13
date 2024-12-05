@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            user-select: none;
+        }
+        .cell.disabled {
+            pointer-events: none;
+        }
+        .result {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .reset-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .reset-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <div class="game-board" id="gameBoard">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+    <div class="result" id="result"></div>
+    <button class="reset-btn" id="resetBtn">Reset Game</button>
+</div>
+
+<script>
+    const board = document.getElementById('gameBoard');
+    const result = document.getElementById('result');
+    const resetButton = document.getElementById('resetBtn');
+    let currentPlayer = 'X';
+    let gameActive = true;
+    const gameState = ['', '', '', '', '', '', '', '', ''];
+
+    const winningCombinations = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+    ];
+
+    function handleCellClick(event) {
+        const cell = event.target;
+        const index = cell.getAttribute('data-index');
+
+        if (gameState[index] !== '' || !gameActive) return;
+
+        gameState[index] = currentPlayer;
+        cell.textContent = currentPlayer;
+        cell.classList.add('disabled');
+
+        if (checkWinner()) {
+            result.textContent = `${currentPlayer} wins!`;
+            gameActive = false;
+        } else if (gameState.every(cell => cell !== '')) {
+            result.textContent = 'It\'s a draw!';
+            gameActive = false;
+        } else {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        }
+    }
+
+    function checkWinner() {
+        return winningCombinations.some(combination => {
+            const [a, b, c] = combination;
+            return gameState[a] === gameState[b] && gameState[b] === gameState[c] && gameState[a] !== '';
+        });
+    }
+
+    function resetGame() {
+        gameState.fill('');
+        gameActive = true;
+        currentPlayer = 'X';
+        result.textContent = '';
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.textContent = '';
+            cell.classList.remove('disabled');
+        });
+    }
+
+    board.addEventListener('click', handleCellClick);
+    resetButton.addEventListener('click', resetGame);
+</script>
+
+</body>
+</html>
